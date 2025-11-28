@@ -116,6 +116,7 @@ const styles = {
     backgroundColor: '#f0f2f5',
     fontFamily: 'sans-serif',
     width: '100vw',
+    color: '#333',
   },
   card: {
     backgroundColor: 'white',
