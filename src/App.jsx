@@ -9,14 +9,15 @@ function App() {
   const [showAnswer, setShowAnswer] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
+useEffect(() => {
     const fetchSheetData = async () => {
       try {
         const response = await fetch(GOOGLE_SHEET_CSV_URL);
-        const reader = response.body.getReader();
-        const result = await reader.read();
-        const decoder = new TextDecoder('utf-8');
-        const csv = decoder.decode(result.value);
+        
+        // [수정된 부분] 복잡한 reader 대신 text() 메서드 사용
+        // 이 함수는 모든 데이터가 다 받아질 때까지 자동으로 기다려줍니다.
+        const csv = await response.text(); 
+
         // 배열을 무작위로 섞는 함수
         const shuffleArray = (array) => {
           let currentIndex = array.length, randomIndex;
@@ -29,17 +30,15 @@ function App() {
         };
 
         Papa.parse(csv, {
-          header: false, // 열 순서(인덱스)로 접근하기 위해 false로 설정
+          header: false, 
           skipEmptyLines: true,
           complete: (results) => {
-            // results.data는 2차원 배열입니다. [[A1, B1, C1, D1], [A2, B2...]]
-
-            // 1. 헤더(첫 번째 줄) 제거 (필요하다면)
+            // 헤더 제거
             const rows = results.data.slice(1);
-
-            // 2. 랜덤 섞기 (Fisher-Yates Shuffle 알고리즘)
+            // 섞기
             const shuffled = shuffleArray(rows);
-
+            
+            console.log("전체 데이터 개수:", shuffled.length); // 콘솔에서 개수 확인 가능
             setQuizData(shuffled);
             setLoading(false);
           },
@@ -52,7 +51,6 @@ function App() {
 
     fetchSheetData();
   }, []);
-
 
 
   // 다음 문제로 넘어가는 함수
